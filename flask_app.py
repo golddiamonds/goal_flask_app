@@ -6,7 +6,7 @@ from flask import Flask, request, jsonify, session, g, redirect, url_for, \
 
 # configuration
 DEBUG = True
-SECRET_KEY = '5439628284705L'
+SECRET_KEY = ''
 
 app = Flask(__name__)
 app.config.from_object(__name__)
