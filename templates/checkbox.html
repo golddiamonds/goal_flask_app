@@ -1,0 +1,26 @@
+{% block head %}
+<script src="/static/jquery-1.8.2.min.js"></script>
+<link rel=stylesheet type=text/css href="/static/style.css">
+{% endblock %}
+{% block body %}
+
+<script>
+$(function(){
+    $('#checkboxid').change(function() {
+        var a = $('input[name="a"]').val();
+        $("#checkboxclass").toggleClass("strike");
+        if ($('#checkboxid').is(':checked')){
+            alert('Checked!' + a);
+            $.getJSON('/_done_check', {a: $('input[name="a"]').val(),}, function(data) { $('#result').text(data.result)});
+        } else {
+            alert('Unchecked!');
+            $.getJSON('/_done_uncheck', {a: $('input[name="a"]').val(),}, function(data) { $('#result').text(data.result)});
+        }
+    });
+});
+</script>
+
+<input type=hidden name=a value=3>
+ <input id=checkboxid type=checkbox checked /><div id="checkboxclass" class=strike>checkbox</div>
+
+{% endblock %}

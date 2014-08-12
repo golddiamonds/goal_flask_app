@@ -1,0 +1,63 @@
+{% block head %}
+
+<link rel=stylesheet type=text/css href="/static/style.css">
+<script src="/static/jquery-1.8.2.min.js"></script>
+
+{% endblock %}
+
+{% block body %}
+
+<table>
+
+    <tr id="divTestArea4">
+    <td valign=top>
+<script type=text/javascript>
+  $(function() {
+    $('a#x_trash').bind('click', function() {
+      $("#divTestArea4").fadeOut("slow");  
+      $.getJSON('/_move_trash', {
+        a: $('input[name="a"]').val(),
+      }, function(data) {
+        $("#result").text(data.result);
+      });
+      return false;
+    });
+  });
+</script>
+<script type=text/javascript>
+  $(function() {
+    $('a#a_archive').bind('click', function() {
+      $("#divTestArea4").fadeOut("slow");  
+      $.getJSON('/_move_archive', {
+        a: $('input[name="a"]').val(),
+      }, function(data) {
+        $("#result").text(data.result);
+      });
+      return false;
+    });
+  });
+</script>
+<script type=text/javascript>
+  $(function() {
+    $('a#m_main').bind('click', function() {
+      $("#divTestArea4").fadeOut("slow");  
+      $.getJSON('/_move_main', {
+        a: $('input[name="a"]').val(),
+      }, function(data) {
+        $("#result").text(data.result);
+      });
+      return false;
+    });
+  });
+</script>
+
+        <input type=hidden name=a value=3>
+        <a href="javascript:void(0);" id=x_trash>x</a> / <a href="javascript:void(0);" id=a_archive>a</a> / <a href="javascript:void(0);" id=m_main>m</a>
+        
+            
+    </td>
+    </tr>
+
+</table>
+
+{% endblock %}

@@ -1,0 +1,32 @@
+<script src="/static/jquery-1.8.2.min.js"></script>
+<script type=text/javascript>
+  $SCRIPT_ROOT = {{ request.script_root|tojson|safe }};
+</script>
+<script type=text/javascript>
+  $(function() {
+    $('a#calculate').bind('click', function() {
+      $.getJSON('/_add_numbers', {
+        a: $('input[name="a"]').val(),
+      }, function(data) {
+        $("#result").text(data.result);
+      });
+      return false;
+    });
+  });
+</script>
+<script type=text/javascript>
+  $(function() {
+    $('a#subtract').bind('click', function() {
+      $.getJSON('/_subtract_numbers', {
+        a: $('input[name="a"]').val(),
+      }, function(data) {
+        $("#result").text(data.result);
+      });
+      return false;
+    });
+  });
+</script>
+<h1>jQuery Example</h1>
+<p><input type=hidden name=a value=3>
+   <span id=result>original value</span>
+<p><a href=# id=calculate>+</a>/<a href=# id=subtract>-</a>

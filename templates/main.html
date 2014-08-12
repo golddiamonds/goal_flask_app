@@ -1,0 +1,199 @@
+{% block head %}
+
+<link rel=stylesheet type=text/css href="/static/style.css">
+<script src="/static/jquery-1.8.2.min.js"></script>
+<script src="/static/table.js"></script>
+
+{% endblock %}
+
+{% block body %}
+
+<center>
+{# <h1><font color = #32CD32>gooooooaaals</font></h1> #}
+  {% if not session.logged_in %}
+    <a href="{{ url_for('login') }}">log in</a> | <a href="{{ url_for('registration') }}">registration</a>
+  {% else %}
+    <a href="{{ url_for('logout') }}">log out</a>
+  {% endif %}
+  {% if session.logged_in %}
+<table width = 700>
+<tr>
+<td>
+    <center>
+    <form name="addform" action="{{ url_for('add_entry') }}" method="POST">
+        <input type=text size=30 name=goal placeholder='goal'>
+        <select name=priority>
+            <option value="1">1</option>
+            <option value="2">2</option>
+            <option value="3" selected="selected">3</option>
+            <option value="4">4</option>
+            <option value="5">5</option>
+        </select>
+        <input type=text size=15 name=category placeholder='category'>
+        <input type=submit value=add>
+    </form>
+    <p>
+    <a href="/">main</a> | <a href="/archive">archive</a> | <a href="/trash">trash</a> <font size=1>(<a href="/delete">empty</a>)</font>
+ </td>
+ </tr>
+ </table>
+ <center>
+ <p>
+ <table width = 550 bgcolor=D9D9D9>
+ <tr>
+ <td>
+ <font size=-1 color = FFFFFF>total: {% for goals in count_goals %} {{goals.count|safe}} {% endfor %}
+ </td><td>
+ <font size=-1 color = FFFFFF>undone: {{count_goals_undone|safe}}
+ </td><td>
+ <font size=-1 color = FFFFFF>done: {{count_goals_done|safe}}
+ </td>
+ </tr>
+ </table>
+ <p>
+ <table width = 700 class="table-autosort table-autofilter">
+ <thead>
+ <tr>
+    <td valign=top width=20></td>
+    <td class="table-filterable table-sortable:numeric" valign=top width=50>priority</td>
+    <td class="table-sortable:alphanumeric" valign=top width=270>goal</td>
+    <td class="table-filterable table-sortable:alphanumeric" valign=top width=120>category</td>
+    <td class="table-sortable:date" valign=top width=120>time entered</td>
+    <td class="table-sortable:alphanumeric" valign=top width=40>done?</td>
+    <td valign=top width=80>move</td>
+</tr>
+</thead>
+  {% for entry in entries %}
+    <tr id="divTestArea4{{entry.id|safe}}">
+    <td valign=top><font size=-1>
+    <script type=text/javascript>
+
+  $(function() {
+    $('a#calculate{{entry.id|safe}}').bind('click', function() {
+      $.getJSON('/_add_numbers', {
+        a: $('input[name="a{{entry.id|safe}}"]').val(),
+      }, function(data) {
+        $("#result{{entry.id|safe}}").text(data.result);
+      });
+      return false;
+    });
+  });
+</script>
+<script type=text/javascript>
+  $(function() {
+    $('a#subtract{{entry.id|safe}}').bind('click', function() {
+      $.getJSON('/_subtract_numbers', {
+        a: $('input[name="a{{entry.id|safe}}"]').val(),
+      }, function(data) {
+        $("#result{{entry.id|safe}}").text(data.result);
+      });
+      return false;
+    });
+  });
+</script>
+<input type=hidden name=a{{entry.id|safe}} value={{entry.id|safe}}>
+<a href=# id=calculate{{entry.id|safe}}>+</a>/<a href=# id=subtract{{entry.id|safe}}>-</a>
+
+   </td>
+    <td valign=top><center>
+    <font size=-1><span id=result{{entry.id|safe}}>{{ entry.priority|safe }}</span>
+        {# old priority <font size = -1>{{ entry.priority|safe }} #}
+    </td>
+    <td valign=top>
+        <font size = -1>
+        {% if entry.done_value == 1 %}
+            <div id="checkboxclass{{entry.id|safe}}" class=strike>{{ entry.goal|safe }}</div>
+        {% else %}
+            <div id="checkboxclass{{entry.id|safe}}">{{ entry.goal|safe }}</div>
+        {% endif %}
+        </font>
+    </td>
+    <td valign=top>
+        <font size = -1>{{ entry.category|safe }} </font>
+    </td>
+    <td valign=top>
+        <font size = -1> {{ entry.entered_time|safe }}</font>
+    </td>
+    <td>
+        <font size = -1>
+        <script>
+        $(function(){
+            $('#checkboxid{{entry.id|safe}}').change(function() {
+            var a = $('input[name="a_check{{entry.id|safe}}"]').val();
+            $("#checkboxclass{{entry.id|safe}}").toggleClass("strike");
+            if ($('#checkboxid{{entry.id|safe}}').is(':checked')){
+                $.getJSON('/_done_check', {a: $('input[name="a_check{{entry.id|safe}}"]').val(),}, function(data) { $('#result').text(data.result)});
+            } else {
+                $.getJSON('/_done_uncheck', {a: $('input[name="a_check{{entry.id|safe}}"]').val(),}, function(data) { $('#result').text(data.result)});
+                }
+            });
+        });
+        </script>
+        {% if entry.done_value == 0 %}
+        <input type=hidden name=a_check{{entry.id|safe}} value={{entry.id|safe}}>
+        <input id=checkboxid{{entry.id|safe}} type=checkbox />
+        {% else %}
+        <input type=hidden name=a_check{{entry.id|safe}} value={{entry.id|safe}}>
+        <input id=checkboxid{{entry.id|safe}} type=checkbox checked />
+        {% endif %}
+        </font>
+    </td>
+    <td valign=top>
+        <script type=text/javascript>
+        $(function() {
+            $('a#x_trash{{entry.id|safe}}').bind('click', function() {
+                $("#divTestArea4{{entry.id|safe}}").fadeOut("slow");
+                    $.getJSON('/_move_trash', {
+                        a: $('input[name="a_move{{entry.id|safe}}"]').val(),
+                        }, function(data) {
+                        $("#result").text(data.result);
+                    });
+                return false;
+            });
+         });
+        </script>
+        <script type=text/javascript>
+         $(function() {
+            $('a#a_archive{{entry.id|safe}}').bind('click', function() {
+                $("#divTestArea4{{entry.id|safe}}").fadeOut("slow");
+                    $.getJSON('/_move_archive', {
+                    a: $('input[name="a_move{{entry.id|safe}}"]').val(),
+                    }, function(data) {
+                    $("#result").text(data.result);
+                    });
+                return false;
+            });
+        });
+        </script>
+        <script type=text/javascript>
+        $(function() {
+            $('a#m_main{{entry.id|safe}}').bind('click', function() {
+            $("#divTestArea4{{entry.id|safe}}").fadeOut("slow");
+                $.getJSON('/_move_main', {
+                a: $('input[name="a_move{{entry.id|safe}}"]').val(),
+                }, function(data) {
+                $("#result").text(data.result);
+                });
+            return false;
+            });
+        });
+        </script>
+
+        <input type=hidden name=a_move{{entry.id|safe}} value={{entry.id|safe}}>
+        <a href="javascript:void(0);" id=x_trash{{entry.id|safe}}>x</a> / <a href="javascript:void(0);" id=a_archive{{entry.id|safe}}>a</a> / <a href="javascript:void(0);" id=m_main{{entry.id|safe}}>m</a>
+    </td>
+    </tr>
+  {% else %}
+    <tr>
+    <td>
+    Unbelievable.  No entries here so far
+    </td>
+    </tr>
+  {% endfor %}
+  </table>
+  <p>
+  {% endif %}
+  <center>
+  <font size = 1 color = 666666>(c)2012 ryanh; made with python, mysql and flask. thnx to pythonanywhere.com</font>
+
+{% endblock %}
